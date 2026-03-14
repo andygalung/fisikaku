@@ -31,10 +31,12 @@ class SoalLkpd extends Model
 
     public function getFotoUrlAttribute()
     {
-        if ($this->foto) {
+        // Gunakan array_key_exists untuk memastikan kolom 'foto' ada di model 
+        // agar tidak error jika database belum terupdate
+        if (isset($this->attributes['foto']) && $this->attributes['foto']) {
             /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
             $storage = Storage::disk('public');
-            return $storage->url($this->foto);
+            return $storage->url($this->attributes['foto']);
         }
         return null;
     }

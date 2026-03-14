@@ -81,12 +81,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/student-summary', [ReportController::class, 'getStudentSummary']);
 });
 
-// Route Sementara untuk Migrasi di Hostinger (Hapus setelah digunakan!)
+// Route Sementara untuk Migrasi & Fix di Hostinger (Hapus setelah digunakan!)
 Route::get('/run-migration', function () {
     try {
         Artisan::call('migrate', ['--force' => true]);
         return "Migrasi Berhasil: " . Artisan::output();
     } catch (\Exception $e) {
         return "Migrasi Gagal: " . $e->getMessage();
+    }
+});
+
+Route::get('/fix-database', function () {
+    try {
+        // Paksa tambah kolom 'foto' jika belum ada
+        if (!Schema::hasColumn('soal_lkpd', 'foto')) {
+            Schema::table('soal_lkpd', function ($table) {
+                $table->string('foto')->nullable()->after('pertanyaan');
+            });
+            return "Kolom 'foto' berhasil ditambahkan ke tabel soal_lkpd.";
+        }
+        return "Kolom 'foto' sudah ada di tabel soal_lkpd.";
+    } catch (\Exception $e) {
+        return "Error Fix Database: " . $e->getMessage();
     }
 });
