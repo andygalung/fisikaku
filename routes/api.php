@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LkpdController;
 use App\Http\Controllers\Api\MateriController;
