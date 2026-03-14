@@ -62,7 +62,14 @@ class SoalController extends Controller
             ], 403);
         }
 
-        $data = $request->all();
+        $data = $request->only([
+            'lkpd_id',
+            'tipe_soal',
+            'pertanyaan',
+            'opsi_jawaban',
+            'jawaban_benar',
+            'urutan'
+        ]);
 
         // Handle JSON string for opsi_jawaban if it's Multipart
         if (isset($data['opsi_jawaban']) && is_string($data['opsi_jawaban'])) {
@@ -72,12 +79,15 @@ class SoalController extends Controller
         // Handle Photo Upload
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('soal_photos', 'public');
-            $data['foto'] = $path;
+            // Hanya masukkan ke data jika kolom 'foto' ada di database
+            if (\Illuminate\Support\Facades\Schema::hasColumn('soal_lkpd', 'foto')) {
+                $data['foto'] = $path;
+            }
         }
 
         // Auto-set urutan if not provided
-        if (!$request->has('urutan')) {
-            $maxUrutan = SoalLkpd::where('lkpd_id', $request->lkpd_id)->max('urutan');
+        if (!isset($data['urutan'])) {
+            $maxUrutan = SoalLkpd::where('lkpd_id', $data['lkpd_id'])->max('urutan');
             $data['urutan'] = ($maxUrutan ?? 0) + 1;
         }
 
